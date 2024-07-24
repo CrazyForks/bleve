@@ -67,13 +67,14 @@ func NewFuzzySearcher(ctx context.Context, indexReader index.IndexReader, term s
 		}
 	}
 
-	return NewMultiTermSearcher(ctx, indexReader, candidates, field,
-		boost, options, true)
+	return NewMultiTermSearcherBoosted(ctx, indexReader, candidates, field,
+		boost, fuzzyCandidates.editDistances, options, true)
 }
 
 type fuzzyCandidates struct {
-	candidates []string
-	bytesRead  uint64
+	candidates    []string
+	editDistances []int
+	bytesRead     uint64
 }
 
 func reportIOStats(ctx context.Context, bytesRead uint64) {
@@ -91,9 +92,10 @@ func reportIOStats(ctx context.Context, bytesRead uint64) {
 func findFuzzyCandidateTerms(indexReader index.IndexReader, term string,
 	fuzziness int, field, prefixTerm string) (rv *fuzzyCandidates, err error) {
 	rv = &fuzzyCandidates{
-		candidates: make([]string, 0),
+		candidates:    make([]string, 0),
+		editDistances: make([]int, 0),
 	}
-
+	var reuse []int
 	// in case of advanced reader implementations directly call
 	// the levenshtein automaton based iterator to collect the
 	// candidate terms
@@ -110,6 +112,8 @@ func findFuzzyCandidateTerms(indexReader index.IndexReader, term string,
 		tfd, err := fieldDict.Next()
 		for err == nil && tfd != nil {
 			rv.candidates = append(rv.candidates, tfd.Term)
+			ld, _, _ := search.LevenshteinDistanceMaxReuseSlice(term, tfd.Term, fuzziness, reuse)
+			rv.editDistances = append(rv.editDistances, ld)
 			if tooManyClauses(len(rv.candidates)) {
 				return nil, tooManyClausesErr(field, len(rv.candidates))
 			}
@@ -136,7 +140,6 @@ func findFuzzyCandidateTerms(indexReader index.IndexReader, term string,
 	}()
 
 	// enumerate terms and check levenshtein distance
-	var reuse []int
 	tfd, err := fieldDict.Next()
 	for err == nil && tfd != nil {
 		var ld int
@@ -144,6 +147,7 @@ func findFuzzyCandidateTerms(indexReader index.IndexReader, term string,
 		ld, exceeded, reuse = search.LevenshteinDistanceMaxReuseSlice(term, tfd.Term, fuzziness, reuse)
 		if !exceeded && ld <= fuzziness {
 			rv.candidates = append(rv.candidates, tfd.Term)
+			rv.editDistances = append(rv.editDistances, ld)
 			if tooManyClauses(len(rv.candidates)) {
 				return nil, tooManyClausesErr(field, len(rv.candidates))
 			}
