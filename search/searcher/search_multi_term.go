@@ -46,7 +46,7 @@ func NewMultiTermSearcher(ctx context.Context, indexReader index.IndexReader, te
 }
 
 func NewMultiTermSearcherBoosted(ctx context.Context, indexReader index.IndexReader, terms []string,
-	field string, boost float64, editDistances []int, options search.SearcherOptions, limit bool) (
+	field string, boost float64, editDistances []uint8, options search.SearcherOptions, limit bool) (
 	search.Searcher, error) {
 
 	if tooManyClauses(len(terms)) {
@@ -175,7 +175,7 @@ func makeBatchSearchers(ctx context.Context, indexReader index.IndexReader, term
 }
 
 func makeBatchSearchersBoosted(ctx context.Context, indexReader index.IndexReader, terms []string, field string,
-	boost float64, editDistances []int, options search.SearcherOptions) ([]search.Searcher, error) {
+	boost float64, editDistances []uint8, options search.SearcherOptions) ([]search.Searcher, error) {
 
 	qsearchers := make([]search.Searcher, len(terms))
 	qsearchersClose := func() {

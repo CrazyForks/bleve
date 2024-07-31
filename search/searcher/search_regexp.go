@@ -15,10 +15,8 @@
 package searcher
 
 import (
-	"bytes"
 	"context"
 	"regexp"
-	"unicode"
 
 	"github.com/blevesearch/bleve/v2/search"
 	index "github.com/blevesearch/bleve_index_api"
@@ -61,27 +59,17 @@ func NewRegexpStringSearcher(ctx context.Context, indexReader index.IndexReader,
 	}()
 
 	var candidateTerms []string
-	var editDistances []int
-	var baseBuf bytes.Buffer
 
-	for _, char := range pattern {
-		if unicode.IsLetter(char) {
-			baseBuf.WriteRune(char)
-		}
-	}
-	baseStr := baseBuf.String()
 	tfd, err := fieldDict.Next()
 	for err == nil && tfd != nil {
 		candidateTerms = append(candidateTerms, tfd.Term)
-		ld := search.LevenshteinDistance(tfd.Term, baseStr)
-		editDistances = append(editDistances, ld)
 		tfd, err = fieldDict.Next()
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	return NewMultiTermSearcherBoosted(ctx, indexReader, candidateTerms, field, boost, editDistances,
+	return NewMultiTermSearcher(ctx, indexReader, candidateTerms, field, boost,
 		options, true)
 }
 

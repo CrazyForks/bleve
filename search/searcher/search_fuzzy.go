@@ -73,7 +73,7 @@ func NewFuzzySearcher(ctx context.Context, indexReader index.IndexReader, term s
 
 type fuzzyCandidates struct {
 	candidates    []string
-	editDistances []int
+	editDistances []uint8
 	bytesRead     uint64
 }
 
@@ -93,7 +93,7 @@ func findFuzzyCandidateTerms(indexReader index.IndexReader, term string,
 	fuzziness int, field, prefixTerm string) (rv *fuzzyCandidates, err error) {
 	rv = &fuzzyCandidates{
 		candidates:    make([]string, 0),
-		editDistances: make([]int, 0),
+		editDistances: make([]uint8, 0),
 	}
 	var reuse []int
 	// in case of advanced reader implementations directly call
@@ -112,8 +112,7 @@ func findFuzzyCandidateTerms(indexReader index.IndexReader, term string,
 		tfd, err := fieldDict.Next()
 		for err == nil && tfd != nil {
 			rv.candidates = append(rv.candidates, tfd.Term)
-			ld, _, _ := search.LevenshteinDistanceMaxReuseSlice(term, tfd.Term, fuzziness, reuse)
-			rv.editDistances = append(rv.editDistances, ld)
+			rv.editDistances = append(rv.editDistances, tfd.Distance)
 			if tooManyClauses(len(rv.candidates)) {
 				return nil, tooManyClausesErr(field, len(rv.candidates))
 			}
@@ -147,7 +146,7 @@ func findFuzzyCandidateTerms(indexReader index.IndexReader, term string,
 		ld, exceeded, reuse = search.LevenshteinDistanceMaxReuseSlice(term, tfd.Term, fuzziness, reuse)
 		if !exceeded && ld <= fuzziness {
 			rv.candidates = append(rv.candidates, tfd.Term)
-			rv.editDistances = append(rv.editDistances, ld)
+			rv.editDistances = append(rv.editDistances, uint8(ld))
 			if tooManyClauses(len(rv.candidates)) {
 				return nil, tooManyClausesErr(field, len(rv.candidates))
 			}
