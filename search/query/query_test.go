@@ -51,14 +51,14 @@ func TestParseQuery(t *testing.T) {
 		output Query
 		err    bool
 	}{
-		// {
-		// 	input: []byte(`{"term":"water","field":"desc"}`),
-		// 	output: func() Query {
-		// 		q := NewTermQuery("water")
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
+		{
+			input: []byte(`{"term":"water","field":"desc"}`),
+			output: func() Query {
+				q := NewTermQuery("water")
+				q.SetField("desc")
+				return q
+			}(),
+		},
 		{
 			input: []byte(`{"match":"beer","field":"desc"}`),
 			output: func() Query {
@@ -67,157 +67,157 @@ func TestParseQuery(t *testing.T) {
 				return q
 			}(),
 		},
-		// {
-		// 	input: []byte(`{"match":"beer","field":"desc","operator":"or"}`),
-		// 	output: func() Query {
-		// 		q := NewMatchQuery("beer")
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input: []byte(`{"match":"beer","field":"desc","operator":"and"}`),
-		// 	output: func() Query {
-		// 		q := NewMatchQuery("beer")
-		// 		q.SetOperator(MatchQueryOperatorAnd)
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input: []byte(`{"match":"beer","field":"desc","operator":"and"}`),
-		// 	output: func() Query {
-		// 		operator := MatchQueryOperatorAnd
-		// 		q := NewMatchQuery("beer")
-		// 		q.SetOperator(operator)
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input: []byte(`{"match":"beer","field":"desc","operator":"or"}`),
-		// 	output: func() Query {
-		// 		q := NewMatchQuery("beer")
-		// 		q.SetOperator(MatchQueryOperatorOr)
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input: []byte(`{"match":"beer","field":"desc","operator":"or"}`),
-		// 	output: func() Query {
-		// 		operator := MatchQueryOperatorOr
-		// 		q := NewMatchQuery("beer")
-		// 		q.SetOperator(operator)
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input:  []byte(`{"match":"beer","field":"desc","operator":"does not exist"}`),
-		// 	output: nil,
-		// 	err:    true,
-		// },
-		// {
-		// 	input: []byte(`{"match_phrase":"light beer","field":"desc"}`),
-		// 	output: func() Query {
-		// 		q := NewMatchPhraseQuery("light beer")
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input: []byte(`{"must":{"conjuncts": [{"match":"beer","field":"desc"}]},"should":{"disjuncts": [{"match":"water","field":"desc"}],"min":1.0},"must_not":{"disjuncts": [{"match":"devon","field":"desc"}]}}`),
-		// 	output: func() Query {
-		// 		q := NewBooleanQuery(
-		// 			[]Query{func() Query {
-		// 				q := NewMatchQuery("beer")
-		// 				q.SetField("desc")
-		// 				return q
-		// 			}()},
-		// 			[]Query{func() Query {
-		// 				q := NewMatchQuery("water")
-		// 				q.SetField("desc")
-		// 				return q
-		// 			}()},
-		// 			[]Query{func() Query {
-		// 				q := NewMatchQuery("devon")
-		// 				q.SetField("desc")
-		// 				return q
-		// 			}()})
-		// 		q.SetMinShould(1)
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input:  []byte(`{"terms":["watered","down"],"field":"desc"}`),
-		// 	output: NewPhraseQuery([]string{"watered", "down"}, "desc"),
-		// },
-		// {
-		// 	input:  []byte(`{"query":"+beer \"light beer\" -devon"}`),
-		// 	output: NewQueryStringQuery(`+beer "light beer" -devon`),
-		// },
-		// {
-		// 	input: []byte(`{"min":5.1,"max":7.1,"field":"desc"}`),
-		// 	output: func() Query {
-		// 		q := NewNumericRangeQuery(&minNum, &maxNum)
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input: []byte(`{"min":"bob","max":"cat","field":"desc"}`),
-		// 	output: func() Query {
-		// 		q := NewTermRangeQuery(minTerm, maxTerm)
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input: []byte(`{"start":"` + startDateStr + `","end":"` + endDateStr + `","field":"desc"}`),
-		// 	output: func() Query {
-		// 		q := NewDateRangeStringQuery(startDateStr, endDateStr)
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input: []byte(`{"prefix":"budwei","field":"desc"}`),
-		// 	output: func() Query {
-		// 		q := NewPrefixQuery("budwei")
-		// 		q.SetField("desc")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input:  []byte(`{"match_all":{}}`),
-		// 	output: NewMatchAllQuery(),
-		// },
-		// {
-		// 	input:  []byte(`{"match_none":{}}`),
-		// 	output: NewMatchNoneQuery(),
-		// },
-		// {
-		// 	input:  []byte(`{"ids":["a","b","c"]}`),
-		// 	output: NewDocIDQuery([]string{"a", "b", "c"}),
-		// },
-		// {
-		// 	input:  []byte(`{"bool": true}`),
-		// 	output: NewBoolFieldQuery(true),
-		// },
-		// {
-		// 	input: []byte(`{"field": "x", "cidr": "1.2.3.0/4"}`),
-		// 	output: func() Query {
-		// 		q := NewIPRangeQuery("1.2.3.0/4")
-		// 		q.SetField("x")
-		// 		return q
-		// 	}(),
-		// },
-		// {
-		// 	input:  []byte(`{"madeitup":"queryhere"}`),
-		// 	output: nil,
-		// 	err:    true,
-		// },
+		{
+			input: []byte(`{"match":"beer","field":"desc","operator":"or"}`),
+			output: func() Query {
+				q := NewMatchQuery("beer")
+				q.SetField("desc")
+				return q
+			}(),
+		},
+		{
+			input: []byte(`{"match":"beer","field":"desc","operator":"and"}`),
+			output: func() Query {
+				q := NewMatchQuery("beer")
+				q.SetOperator(MatchQueryOperatorAnd)
+				q.SetField("desc")
+				return q
+			}(),
+		},
+		{
+			input: []byte(`{"match":"beer","field":"desc","operator":"and"}`),
+			output: func() Query {
+				operator := MatchQueryOperatorAnd
+				q := NewMatchQuery("beer")
+				q.SetOperator(operator)
+				q.SetField("desc")
+				return q
+			}(),
+		},
+		{
+			input: []byte(`{"match":"beer","field":"desc","operator":"or"}`),
+			output: func() Query {
+				q := NewMatchQuery("beer")
+				q.SetOperator(MatchQueryOperatorOr)
+				q.SetField("desc")
+				return q
+			}(),
+		},
+		{
+			input: []byte(`{"match":"beer","field":"desc","operator":"or"}`),
+			output: func() Query {
+				operator := MatchQueryOperatorOr
+				q := NewMatchQuery("beer")
+				q.SetOperator(operator)
+				q.SetField("desc")
+				return q
+			}(),
+		},
+		{
+			input:  []byte(`{"match":"beer","field":"desc","operator":"does not exist"}`),
+			output: nil,
+			err:    true,
+		},
+		{
+			input: []byte(`{"match_phrase":"light beer","field":"desc"}`),
+			output: func() Query {
+				q := NewMatchPhraseQuery("light beer")
+				q.SetField("desc")
+				return q
+			}(),
+		},
+		{
+			input: []byte(`{"must":{"conjuncts": [{"match":"beer","field":"desc"}]},"should":{"disjuncts": [{"match":"water","field":"desc"}],"min":1.0},"must_not":{"disjuncts": [{"match":"devon","field":"desc"}]}}`),
+			output: func() Query {
+				q := NewBooleanQuery(
+					[]Query{func() Query {
+						q := NewMatchQuery("beer")
+						q.SetField("desc")
+						return q
+					}()},
+					[]Query{func() Query {
+						q := NewMatchQuery("water")
+						q.SetField("desc")
+						return q
+					}()},
+					[]Query{func() Query {
+						q := NewMatchQuery("devon")
+						q.SetField("desc")
+						return q
+					}()})
+				q.SetMinShould(1)
+				return q
+			}(),
+		},
+		{
+			input:  []byte(`{"terms":["watered","down"],"field":"desc"}`),
+			output: NewPhraseQuery([]string{"watered", "down"}, "desc"),
+		},
+		{
+			input:  []byte(`{"query":"+beer \"light beer\" -devon"}`),
+			output: NewQueryStringQuery(`+beer "light beer" -devon`),
+		},
+		{
+			input: []byte(`{"min":5.1,"max":7.1,"field":"desc"}`),
+			output: func() Query {
+				q := NewNumericRangeQuery(&minNum, &maxNum)
+				q.SetField("desc")
+				return q
+			}(),
+		},
+		{
+			input: []byte(`{"min":"bob","max":"cat","field":"desc"}`),
+			output: func() Query {
+				q := NewTermRangeQuery(minTerm, maxTerm)
+				q.SetField("desc")
+				return q
+			}(),
+		},
+		{
+			input: []byte(`{"start":"` + startDateStr + `","end":"` + endDateStr + `","field":"desc"}`),
+			output: func() Query {
+				q := NewDateRangeStringQuery(startDateStr, endDateStr)
+				q.SetField("desc")
+				return q
+			}(),
+		},
+		{
+			input: []byte(`{"prefix":"budwei","field":"desc"}`),
+			output: func() Query {
+				q := NewPrefixQuery("budwei")
+				q.SetField("desc")
+				return q
+			}(),
+		},
+		{
+			input:  []byte(`{"match_all":{}}`),
+			output: NewMatchAllQuery(),
+		},
+		{
+			input:  []byte(`{"match_none":{}}`),
+			output: NewMatchNoneQuery(),
+		},
+		{
+			input:  []byte(`{"ids":["a","b","c"]}`),
+			output: NewDocIDQuery([]string{"a", "b", "c"}),
+		},
+		{
+			input:  []byte(`{"bool": true}`),
+			output: NewBoolFieldQuery(true),
+		},
+		{
+			input: []byte(`{"field": "x", "cidr": "1.2.3.0/4"}`),
+			output: func() Query {
+				q := NewIPRangeQuery("1.2.3.0/4")
+				q.SetField("x")
+				return q
+			}(),
+		},
+		{
+			input:  []byte(`{"madeitup":"queryhere"}`),
+			output: nil,
+			err:    true,
+		},
 	}
 
 	for i, test := range tests {
