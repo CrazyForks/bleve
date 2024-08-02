@@ -207,7 +207,6 @@ func (q *MatchQuery) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalJSON customizes the JSON marshaling for FuzzyQuery
 func (f *MatchQuery) MarshalJSON() ([]byte, error) {
 	var fuzzyValue interface{}
 	if f.autoFuzzy {
