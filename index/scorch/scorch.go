@@ -49,7 +49,7 @@ type Scorch struct {
 
 	unsafeBatch bool
 
-	rootLock             sync.RWMutex
+	rootLock sync.RWMutex
 
 	root                 *IndexSnapshot // holds 1 ref-count on the root
 	rootPersisted        []chan error   // closed when root is persisted
