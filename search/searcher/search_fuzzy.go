@@ -52,9 +52,11 @@ func NewFuzzySearcher(ctx context.Context, indexReader index.IndexReader, term s
 	}
 
 	var candidates []string
+	var editDistances []uint8
 	var dictBytesRead uint64
 	if fuzzyCandidates != nil {
 		candidates = fuzzyCandidates.candidates
+		editDistances = fuzzyCandidates.editDistances
 		dictBytesRead = fuzzyCandidates.bytesRead
 	}
 
@@ -68,7 +70,7 @@ func NewFuzzySearcher(ctx context.Context, indexReader index.IndexReader, term s
 	}
 
 	return NewMultiTermSearcherBoosted(ctx, indexReader, candidates, field,
-		boost, fuzzyCandidates.editDistances, options, true)
+		boost, editDistances, options, true)
 }
 
 type fuzzyCandidates struct {
@@ -95,7 +97,7 @@ func findFuzzyCandidateTerms(indexReader index.IndexReader, term string,
 		candidates:    make([]string, 0),
 		editDistances: make([]uint8, 0),
 	}
-	var reuse []int
+
 	// in case of advanced reader implementations directly call
 	// the levenshtein automaton based iterator to collect the
 	// candidate terms
@@ -112,7 +114,7 @@ func findFuzzyCandidateTerms(indexReader index.IndexReader, term string,
 		tfd, err := fieldDict.Next()
 		for err == nil && tfd != nil {
 			rv.candidates = append(rv.candidates, tfd.Term)
-			rv.editDistances = append(rv.editDistances, tfd.Distance)
+			rv.editDistances = append(rv.editDistances, tfd.EditDistance)
 			if tooManyClauses(len(rv.candidates)) {
 				return nil, tooManyClausesErr(field, len(rv.candidates))
 			}
@@ -139,6 +141,7 @@ func findFuzzyCandidateTerms(indexReader index.IndexReader, term string,
 	}()
 
 	// enumerate terms and check levenshtein distance
+	var reuse []int
 	tfd, err := fieldDict.Next()
 	for err == nil && tfd != nil {
 		var ld int

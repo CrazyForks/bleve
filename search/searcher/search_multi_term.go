@@ -45,6 +45,8 @@ func NewMultiTermSearcher(ctx context.Context, indexReader index.IndexReader, te
 		options, limit)
 }
 
+// Works similarly to the multi term searcher but additionally boosts individual terms based on
+// their edit distance from the query terms
 func NewMultiTermSearcherBoosted(ctx context.Context, indexReader index.IndexReader, terms []string,
 	field string, boost float64, editDistances []uint8, options search.SearcherOptions, limit bool) (
 	search.Searcher, error) {
