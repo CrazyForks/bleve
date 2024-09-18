@@ -35,7 +35,7 @@ func (b *builderImpl) Index(id string, data interface{}) error {
 	}
 
 	doc := document.NewDocument(id)
-	err := b.m.MapDocument(doc, data)
+	_, err := b.m.MapDocument(doc, data)
 	if err != nil {
 		return err
 	}

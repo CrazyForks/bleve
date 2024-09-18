@@ -321,9 +321,10 @@ func (im *IndexMappingImpl) determineType(data interface{}) string {
 	return im.DefaultType
 }
 
-func (im *IndexMappingImpl) MapDocument(doc *document.Document, data interface{}) error {
+func (im *IndexMappingImpl) MapDocument(doc *document.Document, data interface{}) (bool, error) {
 	docType := im.determineType(data)
 	docMapping := im.mappingForType(docType)
+	indexDoc := docMapping.Enabled
 	if docMapping.Enabled {
 		walkContext := im.newWalkContext(doc, docMapping)
 		docMapping.walkDocument(data, []string{}, []uint64{}, walkContext)
@@ -336,7 +337,7 @@ func (im *IndexMappingImpl) MapDocument(doc *document.Document, data interface{}
 		}
 	}
 
-	return nil
+	return indexDoc, nil
 }
 
 type walkContext struct {

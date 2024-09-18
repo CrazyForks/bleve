@@ -259,7 +259,7 @@ func (i *indexImpl) Index(id string, data interface{}) (err error) {
 	i.FireIndexEvent()
 
 	doc := document.NewDocument(id)
-	err = i.m.MapDocument(doc, data)
+	_, err = i.m.MapDocument(doc, data)
 	if err != nil {
 		return
 	}

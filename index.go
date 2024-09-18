@@ -50,9 +50,12 @@ func (b *Batch) Index(id string, data interface{}) error {
 		eventIndex.FireIndexEvent()
 	}
 	doc := document.NewDocument(id)
-	err := b.index.Mapping().MapDocument(doc, data)
+	mustIndex, err := b.index.Mapping().MapDocument(doc, data)
 	if err != nil {
 		return err
+	}
+	if !mustIndex {
+		return nil
 	}
 	b.internal.Update(doc)
 
